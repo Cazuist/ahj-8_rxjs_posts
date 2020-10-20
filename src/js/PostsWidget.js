@@ -1,7 +1,10 @@
-import { of, fromEvent, Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import {
+  fromEvent, Observable, forkJoin,
+} from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
 
 import Post from './Post';
+import Comment from './Comment';
 
 export default class PostsWidget {
   constructor(container, url) {
@@ -54,30 +57,26 @@ export default class PostsWidget {
 
     post$.pipe(
       switchMap((posts) => {
-        posts.forEach((post) => {
-          let { comments } = post;
-          this.getRequest(`${this.url}/posts/${post.id}/comments/latest?id=${post.id}`)
+        const postsWithComments$ = posts.map((post) => this.getRequest(`${this.url}/posts/${post.id}/comments/latest?id=${post.id}`)
+          .pipe(
+            map((comments) => ({ ...post, comments })),
+          ));
 
-            .subscribe((comm) => {
-              // eslint-disable-next-line no-unused-vars
-              comments = comm;
-            });
-        });
-
-        return of(posts);
+        return forkJoin(postsWithComments$);
       }),
-    ).subscribe((data) => this.drawPosts(data));
+    ).subscribe((postsData) => this.drawPosts(postsData));
   }
 
   drawPosts(posts) {
     posts.forEach((post) => {
       // eslint-disable-next-line no-new
       new Post(this.postBoxEl, post);
-      /* const commentBoxEl = document.querySelector('.manager-posts_comments-box');
+      const commentBoxEl = document.querySelector('.comments-box_tascks');
 
-       post.comments.forEach((comment) => {
+      post.comments.forEach((comment) => {
+        // eslint-disable-next-line no-new
         new Comment(commentBoxEl, comment);
-      }); */
+      });
     });
   }
 

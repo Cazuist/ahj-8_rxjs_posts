@@ -2,8 +2,9 @@ import moment from 'moment';
 
 export default class Comment {
   constructor(container, {
-    id, avatar, content, created,
+    id, avatar, content, created, author,
   }) {
+    this.author = author;
     this.container = container;
     this.id = id;
     this.avatar = avatar;

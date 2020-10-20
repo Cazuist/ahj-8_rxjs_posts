@@ -77,8 +77,12 @@ h1 {
   border: 2px solid gray;
   border-radius: 20px;
 
-  overflow-y: scroll; 
+  overflow-y: scroll;
+}
 
+.manger-post {
+  border-bottom: 2px dashed gray;
+  margin-bottom: 20px;
 }
 
 .post-box_header {
